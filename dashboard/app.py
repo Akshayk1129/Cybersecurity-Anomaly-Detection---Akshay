@@ -650,8 +650,30 @@ def main() -> None:
                     predicted_attack_type=attack_type,
                 )
 
-                # Narrative
-                st.markdown('<p class="section-header">Investigation Narrative</p>', unsafe_allow_html=True)
+                # Generate Analyst Summary
+                st.markdown('<p class="section-header">Analyst Report</p>', unsafe_allow_html=True)
+                top_features_list = explanation.get("top_features", [])
+                if top_features_list:
+                    top_1 = top_features_list[0]["human_name"].lower()
+                    reason_text = f"primarily due to anomalous **{top_1}**"
+                    if len(top_features_list) > 1:
+                        top_2 = top_features_list[1]["human_name"].lower()
+                        reason_text += f", combined with unusual **{top_2}**"
+                    
+                    atk_label = str(row.get("anomaly_type", "General Anomaly"))
+                    if atk_label == "nan" or atk_label == "": atk_label = "General Anomaly"
+                    
+                    rsk_label = row.get("risk_level", "Unknown")
+                    
+                    analyst_summary = (
+                        f"This event was flagged {reason_text}. "
+                        f"The behavioral pattern strongly correlates with a **{atk_label}** attack and poses a **{rsk_label}** risk to the organization. "
+                        f"Review the detailed SHAP contributions and automated SOAR actions to proceed with mitigation."
+                    )
+                    st.info(analyst_summary)
+
+                # Narrative (Detailed Breakdown)
+                st.markdown('<p class="section-header">Detailed Investigation Narrative</p>', unsafe_allow_html=True)
                 narrative = explanation.get("narrative", "No explanation available.")
                 st.markdown(f'<div class="narrative-box">{narrative}</div>', unsafe_allow_html=True)
 
