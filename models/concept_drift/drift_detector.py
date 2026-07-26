@@ -92,8 +92,12 @@ class DriftDetector:
                 if len(cur_data) == 0 or len(ref_data) == 0:
                     continue
                 
+                # Round to 4 decimal places to avoid false drift from CSV float precision truncation
+                cur_data = np.round(cur_data, 4)
+                ref_data_rounded = np.round(ref_data, 4)
+                
                 # Perform 2-sample Kolmogorov-Smirnov test
-                stat, p_value = ks_2samp(ref_data, cur_data)
+                stat, p_value = ks_2samp(ref_data_rounded, cur_data)
                 
                 is_drifting = bool(p_value < self.p_value_threshold)
                 

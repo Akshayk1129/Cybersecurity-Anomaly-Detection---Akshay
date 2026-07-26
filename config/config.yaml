@@ -233,9 +233,9 @@ models:
     tracked_features:
       - "resource_access_entropy"
       - "session_duration_min"
-      - "bytes_up_down_ratio_zscore"
-      - "failed_logins_streak_cumulative"
-      - "login_hour_sin"
+      - "bytes_uploaded_zscore"
+      - "consecutive_failures"
+      - "hour_sin"
       - "profile_hour_deviation"
       - "risk_score"
 
