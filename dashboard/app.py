@@ -17,6 +17,7 @@ Launch:
 
 from __future__ import annotations
 
+import io
 import sys
 from pathlib import Path
 
@@ -429,6 +430,18 @@ def main() -> None:
         alerts = alerts.sort_values("risk_score", ascending=False)
 
         st.markdown(f"Showing **{len(alerts):,}** alerts with risk score >= **{risk_threshold}**")
+
+        if not alerts.empty:
+            buffer = io.BytesIO()
+            with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
+                alerts.to_excel(writer, index=False, sheet_name='Threat Alerts')
+            
+            st.download_button(
+                label="📥 Download Triage Report (Excel)",
+                data=buffer.getvalue(),
+                file_name="SOC_Alert_Triage_Report.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            )
 
         if alerts.empty:
             st.info("No alerts match the current filter criteria. Try lowering the risk threshold.")
