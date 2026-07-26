@@ -601,7 +601,7 @@ def main() -> None:
 
             # Parse selected
             selected_event_id = selected_alert.split(" | ")[0]
-            alert_row = merged[merged["event_id"] == selected_event_id]
+            alert_row = merged[merged["event_id"].astype(str) == selected_event_id]
 
             if not alert_row.empty:
                 row = alert_row.iloc[0]
