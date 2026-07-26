@@ -155,14 +155,18 @@ def main() -> None:
     logger.info("Phase 8: Concept Drift Baseline - START")
     drift_detector = DriftDetector(config_path="config/config.yaml")
     
-    # We combine features and risk scores to form the full reference dataset
+    # Use only the first 70% of data as the "historical" reference baseline.
+    # The dashboard will compare newer (last 30%) data against this baseline
+    # to detect whether behavioral distributions have shifted over time.
     drift_ref_df = features.copy()
     drift_ref_df["risk_score"] = risk_results["risk_score"].values
     
-    drift_detector.fit(drift_ref_df)
+    baseline_cutoff = int(len(drift_ref_df) * 0.7)
+    drift_detector.fit(drift_ref_df.iloc[:baseline_cutoff])
+    
     import joblib
     joblib.dump(drift_detector, PROJECT_ROOT / "saved_models/drift_baseline.joblib")
-    logger.info("Phase 8: Concept Drift Baseline - COMPLETE")
+    logger.info("Phase 8: Concept Drift Baseline - COMPLETE (fitted on first %d rows)", baseline_cutoff)
 
     # ------------------------------------------------------------------
     # Pipeline Summary

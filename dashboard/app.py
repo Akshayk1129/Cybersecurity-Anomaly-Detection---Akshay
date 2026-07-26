@@ -847,10 +847,16 @@ def main() -> None:
             st.info(f"Tracking **{len(drift_detector.tracked_features)}** behavioral features using the Kolmogorov-Smirnov (KS) test (p-value threshold = {drift_detector.p_value_threshold}).")
             
             with st.spinner("Detecting drift on current dataset..."):
-                # Pass the features with risk_score merged in
+                # Compare the most recent 30% of data against the historical baseline
+                # This simulates a real production scenario where you check if the
+                # latest incoming data has shifted from the training-period distribution.
                 current_df = processed_df.copy()
                 current_df["risk_score"] = merged["risk_score"].values
-                drift_results = drift_detector.detect(current_df)
+                
+                recent_cutoff = int(len(current_df) * 0.7)
+                recent_window = current_df.iloc[recent_cutoff:]
+                
+                drift_results = drift_detector.detect(recent_window)
                 
             drifting_features = sum(1 for res in drift_results.values() if res["is_drifting"])
             
