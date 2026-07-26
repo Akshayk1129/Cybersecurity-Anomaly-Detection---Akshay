@@ -66,6 +66,14 @@ st.markdown("""
         background: #0B0F19 !important;
     }
 
+    /* Force Toast popups to top-left corner */
+    [data-testid="stToastContainer"] {
+        top: 3rem !important;
+        left: 2rem !important;
+        bottom: auto !important;
+        right: auto !important;
+    }
+
     /* Hide default Streamlit header bar for cleaner look */
     header[data-testid="stHeader"] {
         background: rgba(11, 15, 25, 0.8) !important;
