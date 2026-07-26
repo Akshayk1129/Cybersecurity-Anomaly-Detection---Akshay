@@ -400,6 +400,10 @@ def main() -> None:
     # PAGE: Executive Summary
     # ===================================================================
     if page == "Executive Summary":
+        if "github_toast_shown" not in st.session_state:
+            st.toast("Don't forget to view the source code on GitHub!", icon="🔗")
+            st.session_state.github_toast_shown = True
+            
         col_title, col_link = st.columns([3, 1])
         with col_title:
             st.markdown("# Executive Threat Summary")
