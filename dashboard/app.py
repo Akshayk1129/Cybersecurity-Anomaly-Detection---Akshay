@@ -56,67 +56,130 @@ st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-    /* Global */
+    /* Global Background and Typography */
     .stApp {
         font-family: 'Inter', sans-serif;
+        background: radial-gradient(circle at 10% 20%, #0B0E14 0%, #151A28 100%);
+        color: #E2E8F0;
     }
 
-    /* Metric Cards */
+    /* Metric Cards with Glassmorphism and Hover Micro-interactions */
     .metric-card {
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-        border: 1px solid rgba(99, 102, 241, 0.3);
-        border-radius: 12px;
-        padding: 20px 24px;
-        margin: 4px 0;
+        background: rgba(30, 41, 59, 0.4);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        border-radius: 16px;
+        padding: 24px;
+        margin: 8px 0;
         text-align: center;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    .metric-card:hover {
+        transform: translateY(-5px);
+        border: 1px solid rgba(99, 102, 241, 0.5);
+        box-shadow: 0 12px 20px -8px rgba(99, 102, 241, 0.3);
+        background: rgba(30, 41, 59, 0.6);
     }
     .metric-card h3 {
-        color: #818cf8;
-        font-size: 0.75rem;
-        font-weight: 500;
+        color: #A5B4FC;
+        font-size: 0.8rem;
+        font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 1.2px;
-        margin-bottom: 4px;
+        letter-spacing: 1.5px;
+        margin-bottom: 8px;
     }
     .metric-card .metric-value {
-        color: #e0e7ff;
-        font-size: 2rem;
-        font-weight: 700;
+        color: #FFFFFF;
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: linear-gradient(to right, #818CF8, #C084FC);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
         margin: 0;
     }
 
     /* Section Headers */
     .section-header {
-        color: #c7d2fe;
-        font-size: 1.1rem;
-        font-weight: 600;
-        margin-top: 28px;
-        margin-bottom: 10px;
-        padding-bottom: 6px;
-        border-bottom: 2px solid rgba(99, 102, 241, 0.3);
+        color: #F8FAFC;
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-top: 32px;
+        margin-bottom: 16px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
-    /* Sidebar */
+    /* Sidebar Styling */
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #0f0f23 0%, #1a1a2e 100%);
+        background: rgba(15, 23, 42, 0.95) !important;
+        backdrop-filter: blur(20px);
+        border-right: 1px solid rgba(255, 255, 255, 0.05);
     }
 
-    /* Alert severity badges */
-    .severity-critical { color: #ef4444; font-weight: 700; }
-    .severity-high { color: #f97316; font-weight: 600; }
-    .severity-medium { color: #eab308; font-weight: 500; }
-    .severity-low { color: #22c55e; font-weight: 400; }
-
-    /* Narrative box */
+    /* Narrative / Explainability Box */
     .narrative-box {
-        background: rgba(30, 30, 60, 0.8);
-        border: 1px solid rgba(99, 102, 241, 0.4);
-        border-radius: 10px;
-        padding: 16px 20px;
-        font-family: 'Inter', monospace;
-        font-size: 0.88rem;
-        line-height: 1.65;
-        color: #c7d2fe;
+        background: linear-gradient(145deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.9));
+        border-left: 4px solid #6366F1;
+        border-radius: 8px;
+        padding: 20px 24px;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.95rem;
+        line-height: 1.7;
+        color: #E2E8F0;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        margin: 10px 0;
+        transition: all 0.3s ease;
+    }
+    .narrative-box:hover {
+        border-left: 4px solid #C084FC;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Custom Scrollbar for a seamless desktop app feel */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+        background: rgba(15, 23, 42, 0.5);
+    }
+    ::-webkit-scrollbar-thumb {
+        background: rgba(99, 102, 241, 0.5);
+        border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: rgba(99, 102, 241, 0.8);
+    }
+
+    /* Interactive Buttons */
+    .stButton>button {
+        background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        padding: 0.5rem 1rem !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2) !important;
+    }
+    .stButton>button:hover {
+        transform: translateY(-2px) scale(1.02) !important;
+        box-shadow: 0 8px 15px rgba(99, 102, 241, 0.4) !important;
+        background: linear-gradient(135deg, #8B5CF6 0%, #A855F7 100%) !important;
+    }
+
+    /* Styled Alert Boxes (info/error/success) */
+    .stAlert {
+        border-radius: 12px !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        backdrop-filter: blur(10px) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
     }
 </style>
 """, unsafe_allow_html=True)
