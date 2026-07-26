@@ -400,7 +400,20 @@ def main() -> None:
     # PAGE: Executive Summary
     # ===================================================================
     if page == "Executive Summary":
-        st.markdown("# Executive Threat Summary")
+        col_title, col_link = st.columns([3, 1])
+        with col_title:
+            st.markdown("# Executive Threat Summary")
+        with col_link:
+            st.markdown(
+                '<div style="text-align: right; padding-top: 15px;">'
+                '<a href="https://github.com/Akshayk1129/Cybersecurity-Anomaly-Detection---Akshay" '
+                'target="_blank" style="text-decoration: none; font-weight: 600; '
+                'background: rgba(167, 139, 250, 0.1); color: #A78BFA; border: 1px solid #A78BFA; '
+                'padding: 8px 16px; border-radius: 8px; font-size: 0.9rem;">'
+                '🔗 View on GitHub</a></div>',
+                unsafe_allow_html=True
+            )
+        
         st.markdown("> **Welcome to the UEBA Dashboard.** This page provides a high-level overview of the current security posture, showing total events analyzed, anomalies detected by the Isolation Forest model, and the global breakdown of attack types.")
 
         anomaly_count = int(merged["is_anomaly"].sum())
