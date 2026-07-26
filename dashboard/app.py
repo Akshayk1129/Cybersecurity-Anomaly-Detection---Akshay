@@ -66,12 +66,12 @@ st.markdown("""
         background: #0B0F19 !important;
     }
 
-    /* Force Toast popups to top-left (adjusted past the sidebar) */
+    /* Force Toast popups to top-right beside the GitHub button */
     [data-testid="stToastContainer"] {
-        top: 3.5rem !important;
-        left: 24rem !important;
+        top: 4.5rem !important;
+        right: 18rem !important;
+        left: auto !important;
         bottom: auto !important;
-        right: auto !important;
     }
 
     /* Hide default Streamlit header bar for cleaner look */
