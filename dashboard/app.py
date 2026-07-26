@@ -358,6 +358,9 @@ def main() -> None:
         st.markdown("---")
         st.markdown("### 🎛️ Filters")
 
+        # Global Search
+        search_query = st.text_input("🔍 Search Entity / Event ID", "", help="Instantly filter the dashboard by an exact ID")
+
         # Risk score threshold
         risk_threshold = st.slider(
             "Minimum Risk Score", 0, 100, 50, step=5,
@@ -381,6 +384,11 @@ def main() -> None:
 
     # --- Apply Filters ---
     filtered = merged.copy()
+    if search_query:
+        filtered = filtered[
+            (filtered["entity_id"].astype(str).str.contains(search_query, case=False, na=False)) |
+            (filtered["event_id"].astype(str).str.contains(search_query, case=False, na=False))
+        ]
     if selected_entity_type != "All":
         filtered = filtered[filtered["entity_type"] == selected_entity_type]
     if selected_dept != "All":
@@ -527,6 +535,23 @@ def main() -> None:
         alerts = filtered[filtered["risk_score"] >= risk_threshold].copy()
         alerts = alerts.sort_values("risk_score", ascending=False)
 
+        # --- TOP THREATS CARDS ---
+        if not alerts.empty:
+            st.markdown('<p class="section-header">🔥 Top Active Threats</p>', unsafe_allow_html=True)
+            t1, t2, t3 = st.columns(3)
+            
+            top_attacker = alerts["entity_id"].mode()[0] if not alerts["entity_id"].empty else "N/A"
+            top_resource = alerts["resource_accessed"].mode()[0] if not alerts["resource_accessed"].empty else "N/A"
+            top_dept = alerts["department"].mode()[0] if not alerts["department"].empty else "N/A"
+            
+            with t1:
+                st.markdown(f'<div class="metric-card"><h3 style="font-size:0.9rem;">Top Attacker</h3><p class="metric-value" style="font-size:1.1rem;white-space:normal;overflow-wrap:break-word;">{top_attacker}</p></div>', unsafe_allow_html=True)
+            with t2:
+                st.markdown(f'<div class="metric-card"><h3 style="font-size:0.9rem;">Most Targeted Resource</h3><p class="metric-value" style="font-size:1.1rem;white-space:normal;overflow-wrap:break-word;">{top_resource}</p></div>', unsafe_allow_html=True)
+            with t3:
+                st.markdown(f'<div class="metric-card"><h3 style="font-size:0.9rem;">Highest Risk Dept</h3><p class="metric-value" style="font-size:1.1rem;white-space:normal;overflow-wrap:break-word;">{top_dept}</p></div>', unsafe_allow_html=True)
+            st.markdown("---")
+
         st.markdown(f"Showing **{len(alerts):,}** alerts with risk score >= **{risk_threshold}**")
 
         if not alerts.empty:
@@ -600,6 +625,33 @@ def main() -> None:
             st.metric("Total Events", f"{len(entity_events):,}")
         with col4:
             st.metric("Anomalies", f"{len(entity_anomalies):,}")
+
+        # --- Visual Timeline ---
+        st.markdown('<p class="section-header">Activity Timeline</p>', unsafe_allow_html=True)
+        if not entity_events.empty:
+            plot_df = entity_events.copy()
+            if "timestamp" in plot_df.columns:
+                plot_df["timestamp"] = pd.to_datetime(plot_df["timestamp"])
+                plot_df = plot_df.sort_values("timestamp")
+                x_axis = "timestamp"
+            else:
+                x_axis = "login_hour"
+            
+            fig_timeline = px.scatter(
+                plot_df, x=x_axis, y="risk_score",
+                color="is_anomaly", 
+                color_discrete_map={0: "#3b82f6", 1: "#ef4444"},
+                hover_data=["anomaly_type", "resource_accessed", "event_id"],
+                template="plotly_dark",
+                title=f"Event Timeline for {selected_entity}"
+            )
+            fig_timeline.update_layout(
+                plot_bgcolor="rgba(0,0,0,0)",
+                paper_bgcolor="rgba(0,0,0,0)",
+                margin=dict(t=40, b=10),
+                height=300
+            )
+            st.plotly_chart(fig_timeline, use_container_width=True)
 
         st.markdown("---")
 
@@ -830,6 +882,35 @@ def main() -> None:
                 ]
                 existing = [c for c in detail_cols if c in alert_row.columns]
                 st.dataframe(alert_row[existing].T.rename(columns={event_idx: "Value"}), use_container_width=True)
+
+                # --- SOAR Simulation ---
+                st.markdown("---")
+                st.markdown('<p class="section-header">🛡️ Automated Response (SOAR)</p>', unsafe_allow_html=True)
+                
+                rsk_lvl = alert_row["risk_level"].iloc[0] if "risk_level" in alert_row.columns else "Medium"
+                
+                c_action, c_blank = st.columns([1, 2])
+                with c_action:
+                    if st.button("▶ Execute Playbook Mitigation", type="primary", use_container_width=True):
+                        import time
+                        progress_bar = st.progress(0)
+                        status_text = st.empty()
+                        
+                        status_text.text("Initiating response playbook...")
+                        time.sleep(0.5)
+                        progress_bar.progress(30)
+                        
+                        status_text.text(f"Isolating entity...")
+                        time.sleep(0.8)
+                        progress_bar.progress(70)
+                        
+                        if rsk_lvl in ["High", "Critical"]:
+                            status_text.text("Blocking IP and revoking sessions...")
+                            time.sleep(0.6)
+                            
+                        progress_bar.progress(100)
+                        status_text.empty()
+                        st.success(f"✅ Mitigation successfully applied. Status updated to CLOSED.")
     # ===================================================================
     # PAGE: Concept Drift
     # ===================================================================
