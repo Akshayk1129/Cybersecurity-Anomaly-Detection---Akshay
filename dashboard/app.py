@@ -175,7 +175,7 @@ def load_response_engine() -> IncidentResponseEngine:
 def compute_risk_results(_iforest, _risk_engine, enriched_df: pd.DataFrame, processed_df: pd.DataFrame) -> pd.DataFrame:
     """Compute anomaly predictions and run the Enterprise Risk Scoring Engine."""
     # Extract feature columns (exclude label and anomaly_type)
-    feature_cols = [c for c in processed_df.columns if c not in ("label", "anomaly_type")]
+    feature_cols = [c for c in processed_df.columns if c not in ("label", "anomaly_type", "entity_id")]
     X = processed_df[feature_cols].replace([np.inf, -np.inf], np.nan).fillna(0)
 
     predictions = _iforest.predict(X)
@@ -636,7 +636,7 @@ def main() -> None:
 
                 # Get processed features for this event
                 event_idx = alert_row.index[0]
-                feature_cols = [c for c in processed_df.columns if c not in ("label", "anomaly_type")]
+                feature_cols = [c for c in processed_df.columns if c not in ("label", "anomaly_type", "entity_id")]
                 event_features = processed_df.loc[[event_idx], feature_cols].copy()
                 event_features = event_features.replace([np.inf, -np.inf], np.nan).fillna(0)
 
