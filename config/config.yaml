@@ -1,0 +1,281 @@
+# =============================================================================
+# Cybersecurity Anomaly Detection - UEBA System
+# Central Configuration
+# =============================================================================
+
+# --- Paths ---
+paths:
+  raw_dataset: "data/Synthetic_Cybersecurity_Access_Logs_v2.xlsx"
+  processed_dataset: "data/processed_dataset.csv"
+  validation_report: "reports/data_validation_report.md"
+  saved_models_dir: "saved_models/"
+  reports_dir: "reports/"
+  logs_dir: "logs/"
+
+# --- Data Validation ---
+validation:
+  # Maximum acceptable percentage of missing values per column before warning
+  max_missing_pct_warning: 5.0
+  # Maximum acceptable percentage of missing values per column before error
+  max_missing_pct_error: 50.0
+  # Maximum acceptable number of duplicate rows
+  max_duplicate_rows: 0
+  # Expected entity types in the dataset
+  expected_entity_types:
+    - "User"
+    - "Service Account"
+    - "Edge Device"
+  # Expected label values
+  expected_labels:
+    - "Normal"
+    - "Anomaly"
+  # Expected anomaly types
+  expected_anomaly_types:
+    - "Normal"
+    - "Brute Force"
+    - "Credential Stuffing"
+    - "Impossible Travel"
+    - "Lateral Movement"
+    - "Device Spoofing"
+    - "Low-and-Slow Exfiltration"
+    - "Insider Drift"
+  # Columns expected to contain valid timestamps
+  timestamp_columns:
+    - "timestamp"
+  # Numeric columns with expected non-negative values
+  non_negative_columns:
+    - "session_duration_min"
+    - "bytes_uploaded"
+    - "bytes_downloaded"
+    - "failed_attempts"
+    - "geo_velocity_kmph"
+  # Columns expected to be categorical
+  categorical_columns:
+    - "entity_type"
+    - "department"
+    - "day_of_week"
+    - "geo_location"
+    - "resource_accessed"
+    - "resource_type"
+    - "resource_sensitivity"
+    - "auth_method"
+    - "login_status"
+    - "os"
+    - "protocol"
+    - "privilege_level"
+    - "label"
+    - "anomaly_type"
+
+# --- Preprocessing ---
+preprocessing:
+  # Columns to drop before modelling (identifiers, raw text)
+  drop_columns:
+    - "event_id"
+    - "entity_id"
+    - "source_ip"
+    - "command_sequence"
+    - "device_fingerprint"
+  # Target / label columns — kept aside, not encoded with features
+  target_columns:
+    - "label"
+    - "anomaly_type"
+  # ID column preserved for entity-level operations
+  entity_id_column: "entity_id"
+  # Missing value strategies
+  missing_values:
+    browser: "Not_Applicable"  # Service accounts & edge devices have no browser
+    session_duration_min_clamp: 0.0  # Clamp negatives to zero
+  # Ordinal encoding maps (ordered low-to-high)
+  ordinal_columns:
+    resource_sensitivity:
+      - "Low"
+      - "Medium"
+      - "High"
+      - "Critical"
+    privilege_level:
+      - "Device"
+      - "User"
+      - "Service"
+      - "PowerUser"
+      - "Admin"
+  # Label encoding (binary / low-cardinality)
+  label_encode_columns:
+    - "entity_type"
+    - "login_status"
+    - "is_off_hours"
+    - "new_device"
+    - "new_location"
+  # One-hot encoding (nominal, moderate cardinality)
+  onehot_encode_columns:
+    - "department"
+    - "day_of_week"
+    - "geo_location"
+    - "resource_type"
+    - "auth_method"
+    - "os"
+    - "protocol"
+    - "browser"
+    - "resource_accessed"
+  # Numeric columns to standard-scale
+  scale_columns:
+    - "login_hour"
+    - "session_duration_min"
+    - "bytes_uploaded"
+    - "bytes_downloaded"
+    - "failed_attempts"
+    - "geo_velocity_kmph"
+    # Engineered features (Phase 3)
+    - "hour_sin"
+    - "hour_cos"
+    - "time_since_last_login_min"
+    - "entity_login_count"
+    - "entity_avg_session"
+    - "entity_std_session"
+    - "entity_avg_bytes_up"
+    - "entity_avg_bytes_down"
+    - "entity_failed_rate"
+    - "session_duration_zscore"
+    - "bytes_uploaded_zscore"
+    - "bytes_downloaded_zscore"
+    - "resource_access_entropy"
+    - "unique_resources_cumulative"
+    - "unique_locations_cumulative"
+    - "consecutive_failures"
+    - "new_device_rate"
+    - "new_location_rate"
+    - "peer_avg_session"
+    - "peer_session_deviation"
+    - "peer_avg_bytes_up"
+    - "peer_bytes_up_deviation"
+    - "peer_avg_bytes_down"
+    - "peer_bytes_down_deviation"
+    # Profile deviation features (Phase 4 - Baseline Profiler)
+    - "profile_hour_deviation"
+    - "profile_session_deviation"
+    - "profile_bytes_up_deviation"
+    - "profile_new_geo"
+    - "profile_new_resource"
+    - "profile_new_device"
+
+# --- Logging ---
+logging:
+  level: "INFO"
+  format: "%(asctime)s | %(name)-25s | %(levelname)-8s | %(message)s"
+  date_format: "%Y-%m-%d %H:%M:%S"
+  log_file: "logs/ueba_system.log"
+
+# --- Risk Scoring Engine (Enhancement 1) ---
+risk:
+  # Base weights for computing final risk score (0-100). Will be normalized to sum to 100.
+  weights:
+    anomaly_confidence: 35
+    resource_sensitivity: 20
+    failed_attempts: 10
+    new_device: 10
+    new_location: 5
+    geo_velocity: 5
+    off_hours: 5
+    privilege_level: 10
+  
+  # Risk Level Thresholds
+  levels:
+    low_max: 39
+    medium_max: 69
+    high_max: 89
+    # critical: 90+
+
+# --- ML Models Configuration (Enhancement 3) ---
+models:
+  anomaly_detection:
+    isolation_forest:
+      contamination: 0.02
+      n_estimators: 200
+      max_features: 0.8
+      random_state: 42
+  
+  attack_classification:
+    # Set to true to include these models in the comparative selection
+    use_random_forest: true
+    use_xgboost: true
+    use_lightgbm: true
+    
+    random_forest:
+      n_estimators: 200
+      max_depth: 15
+      class_weight: "balanced"
+      random_state: 42
+      n_jobs: -1
+    
+    xgboost:
+      n_estimators: 200
+      max_depth: 8
+      learning_rate: 0.1
+      subsample: 0.8
+      colsample_bytree: 0.8
+      random_state: 42
+      eval_metric: "mlogloss"
+      n_jobs: -1
+      verbosity: 0
+    
+    lightgbm:
+      n_estimators: 200
+      max_depth: 10
+      learning_rate: 0.1
+      subsample: 0.8
+      colsample_bytree: 0.8
+      class_weight: "balanced"
+      random_state: 42
+      n_jobs: -1
+      verbose: -1
+
+  concept_drift:
+    p_value_threshold: 0.05
+    tracked_features:
+      - "resource_access_entropy"
+      - "session_duration_min"
+      - "bytes_up_down_ratio_zscore"
+      - "failed_logins_streak_cumulative"
+      - "login_hour_sin"
+      - "profile_hour_deviation"
+      - "risk_score"
+
+  incident_response:
+    # Default actions applied if no specific playbook exists
+    default_actions:
+      Low: ["Log Event"]
+      Medium: ["Alert SOC Analyst"]
+      High: ["Alert SOC Analyst", "Trigger MFA Challenge"]
+      Critical: ["Alert SOC Analyst", "Disable Account", "Block Origin IP", "Isolate Device"]
+      
+    playbooks:
+      "Brute Force":
+        Medium: ["Alert SOC Analyst", "Rate Limit IP"]
+        High: ["Alert SOC Analyst", "Block Origin IP", "Trigger MFA Challenge"]
+        Critical: ["Alert SOC Analyst", "Disable Account", "Block Origin IP"]
+        
+      "Lateral Movement":
+        Medium: ["Alert SOC Analyst", "Monitor Peer Activity"]
+        High: ["Alert SOC Analyst", "Restrict Subnet Access"]
+        Critical: ["Alert SOC Analyst", "Isolate Device", "Revoke Active Sessions"]
+        
+      "Credential Stuffing":
+        High: ["Alert SOC Analyst", "Block Origin IP", "Force Password Reset"]
+        Critical: ["Alert SOC Analyst", "Disable Account", "Block Origin IP", "Force Password Reset"]
+        
+      "Insider Drift":
+        Medium: ["Alert SOC Analyst", "Notify Manager"]
+        High: ["Alert SOC Analyst", "Notify Manager", "Revoke Highly Privileged Roles"]
+        Critical: ["Alert SOC Analyst", "Disable Account", "Notify HR and Legal"]
+        
+      "Impossible Travel":
+        Medium: ["Alert SOC Analyst", "Trigger MFA Challenge"]
+        High: ["Alert SOC Analyst", "Trigger MFA Challenge", "Revoke Active Sessions"]
+        Critical: ["Alert SOC Analyst", "Disable Account", "Revoke Active Sessions"]
+        
+      "Low-and-Slow Exfiltration":
+        High: ["Alert SOC Analyst", "Throttle Bandwidth"]
+        Critical: ["Alert SOC Analyst", "Block Destination IP", "Disable Account"]
+        
+      "Device Spoofing":
+        High: ["Alert SOC Analyst", "Quarantine Device MAC"]
+        Critical: ["Alert SOC Analyst", "Quarantine Device MAC", "Revoke Certificates"]
