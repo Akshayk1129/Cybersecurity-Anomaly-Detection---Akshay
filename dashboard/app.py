@@ -234,7 +234,7 @@ def main() -> None:
     # ===================================================================
     with st.sidebar:
         st.markdown("## 🛡️ UEBA Dashboard")
-        st.markdown("**Honeywell Internship Challenge**")
+        st.caption("Enterprise Security Operations Center")
         st.markdown("---")
 
         page = st.radio(
@@ -281,6 +281,7 @@ def main() -> None:
     # ===================================================================
     if page == "Executive Summary":
         st.markdown("# Executive Threat Summary")
+        st.markdown("> **Welcome to the UEBA Dashboard.** This page provides a high-level overview of the current security posture, showing total events analyzed, anomalies detected by the Isolation Forest model, and the global breakdown of attack types.")
 
         anomaly_count = int(merged["is_anomaly"].sum())
         high_risk = int((merged["risk_score"] >= 75).sum())
@@ -425,6 +426,7 @@ def main() -> None:
     # ===================================================================
     elif page == "Alert Triage":
         st.markdown("# Alert Triage & Investigation Console")
+        st.markdown("> **Investigate active threats.** Use the filters on the left to drill down into specific alerts. Expand any row to see automated playbook actions and context.")
 
         alerts = filtered[filtered["risk_score"] >= risk_threshold].copy()
         alerts = alerts.sort_values("risk_score", ascending=False)
@@ -482,6 +484,7 @@ def main() -> None:
     # ===================================================================
     elif page == "Entity Profiler":
         st.markdown("# Entity Behavioral Profiler")
+        st.markdown("> **Analyze individual entity behavior.** Search for any user or service account to compare their current activity against their historical profile and their peer department baseline.")
 
         entity_ids = sorted(enriched_df["entity_id"].unique().tolist())
         selected_entity = st.selectbox("Select Entity", entity_ids, index=0)
@@ -596,6 +599,7 @@ def main() -> None:
     # ===================================================================
     elif page == "Explainability":
         st.markdown("# Alert Explainability & SHAP Analysis")
+        st.markdown("> **Understand the 'Why'.** Select a high-risk alert to see a simple English analyst report and the exact SHAP feature contributions that caused the AI to flag the event.")
 
         # Find anomalous events
         anomalous_events = merged[merged["is_anomaly"] == 1].copy()
@@ -735,7 +739,8 @@ def main() -> None:
     # ===================================================================
     elif page == "Concept Drift":
         st.markdown("## System Health & Concept Drift")
-        st.markdown("Monitor behavioral distribution shifts to ensure model reliability.")
+        st.markdown("> **Monitor AI Reliability.** This page tracks whether the statistical behavior of the network is shifting over time. If a distribution shift is detected (Concept Drift), it alerts the team that the Machine Learning models may need retraining.")
+
         
         drift_model_path = PROJECT_ROOT / "saved_models/drift_baseline.joblib"
         if not drift_model_path.exists():
