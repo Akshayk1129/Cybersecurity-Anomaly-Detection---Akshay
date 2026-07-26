@@ -54,133 +54,179 @@ st.set_page_config(
 # ---------------------------------------------------------------------------
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
-    /* Global Background and Typography */
+    /* ── Global ── */
     .stApp {
         font-family: 'Inter', sans-serif;
-        background: radial-gradient(circle at 10% 20%, #0B0E14 0%, #151A28 100%);
-        color: #E2E8F0;
+        background: #0B0F19;
+        color: #CBD5E1;
+    }
+    html, body, [data-testid="stAppViewContainer"] {
+        background: #0B0F19 !important;
     }
 
-    /* Metric Cards with Glassmorphism and Hover Micro-interactions */
+    /* Hide default Streamlit header bar for cleaner look */
+    header[data-testid="stHeader"] {
+        background: rgba(11, 15, 25, 0.8) !important;
+        backdrop-filter: blur(12px) !important;
+    }
+
+    /* ── Sidebar ── */
+    [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #0D1117 0%, #111827 100%) !important;
+        border-right: 1px solid rgba(99, 102, 241, 0.15);
+    }
+    [data-testid="stSidebar"] .stMarkdown h2 {
+        font-size: 1.15rem !important;
+    }
+    [data-testid="stSidebar"] .stRadio label {
+        font-size: 0.92rem !important;
+        padding: 6px 0 !important;
+    }
+
+    /* ── Metric Cards ── */
     .metric-card {
-        background: rgba(30, 41, 59, 0.4);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid rgba(99, 102, 241, 0.2);
-        border-radius: 16px;
-        padding: 24px;
-        margin: 8px 0;
+        background: linear-gradient(145deg, rgba(30, 41, 59, 0.55), rgba(15, 23, 42, 0.75));
+        border: 1px solid rgba(99, 102, 241, 0.18);
+        border-radius: 14px;
+        padding: 20px 16px;
+        margin: 4px 0;
         text-align: center;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        min-height: 120px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        transition: all 0.25s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     }
     .metric-card:hover {
-        transform: translateY(-5px);
-        border: 1px solid rgba(99, 102, 241, 0.5);
-        box-shadow: 0 12px 20px -8px rgba(99, 102, 241, 0.3);
-        background: rgba(30, 41, 59, 0.6);
+        transform: translateY(-3px);
+        border-color: rgba(99, 102, 241, 0.45);
+        box-shadow: 0 8px 24px rgba(99, 102, 241, 0.18);
     }
     .metric-card h3 {
-        color: #A5B4FC;
-        font-size: 0.8rem;
+        color: #94A3B8;
+        font-size: 0.65rem;
         font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 1.5px;
-        margin-bottom: 8px;
+        letter-spacing: 1.4px;
+        margin: 0 0 6px 0;
+        white-space: nowrap;
     }
     .metric-card .metric-value {
-        color: #FFFFFF;
-        font-size: 2.5rem;
+        font-size: 1.6rem;
         font-weight: 800;
-        background: linear-gradient(to right, #818CF8, #C084FC);
+        margin: 0;
+        white-space: nowrap;
+        background: linear-gradient(135deg, #818CF8, #A78BFA);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        margin: 0;
+        line-height: 1.2;
     }
 
-    /* Section Headers */
+    /* ── Section Headers ── */
     .section-header {
-        color: #F8FAFC;
-        font-size: 1.25rem;
-        font-weight: 700;
-        margin-top: 32px;
-        margin-bottom: 16px;
+        color: #F1F5F9;
+        font-size: 1.05rem;
+        font-weight: 600;
+        margin-top: 28px;
+        margin-bottom: 12px;
         padding-bottom: 8px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        display: flex;
-        align-items: center;
-        gap: 8px;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.15);
     }
 
-    /* Sidebar Styling */
-    [data-testid="stSidebar"] {
-        background: rgba(15, 23, 42, 0.95) !important;
-        backdrop-filter: blur(20px);
-        border-right: 1px solid rgba(255, 255, 255, 0.05);
+    /* ── Page Titles ── */
+    .stApp h1 {
+        font-weight: 800 !important;
+        font-size: 1.8rem !important;
+        color: #F8FAFC !important;
+        letter-spacing: -0.02em;
+    }
+    .stApp h2 {
+        font-weight: 700 !important;
+        font-size: 1.4rem !important;
+        color: #F1F5F9 !important;
     }
 
-    /* Narrative / Explainability Box */
+    /* ── Blockquote Descriptions ── */
+    .stApp blockquote {
+        border-left: 3px solid #6366F1;
+        background: rgba(30, 41, 59, 0.35);
+        padding: 12px 16px;
+        border-radius: 0 8px 8px 0;
+        margin: 8px 0 20px 0;
+        font-size: 0.88rem;
+        color: #94A3B8;
+        line-height: 1.6;
+    }
+
+    /* ── Narrative / Explainability Box ── */
     .narrative-box {
-        background: linear-gradient(145deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.9));
-        border-left: 4px solid #6366F1;
-        border-radius: 8px;
-        padding: 20px 24px;
-        font-family: 'Inter', sans-serif;
-        font-size: 0.95rem;
+        background: rgba(30, 41, 59, 0.5);
+        border-left: 3px solid #6366F1;
+        border-radius: 6px;
+        padding: 18px 22px;
+        font-size: 0.9rem;
         line-height: 1.7;
-        color: #E2E8F0;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        margin: 10px 0;
-        transition: all 0.3s ease;
-    }
-    .narrative-box:hover {
-        border-left: 4px solid #C084FC;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-    }
-    
-    /* Custom Scrollbar for a seamless desktop app feel */
-    ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-    }
-    ::-webkit-scrollbar-track {
-        background: rgba(15, 23, 42, 0.5);
-    }
-    ::-webkit-scrollbar-thumb {
-        background: rgba(99, 102, 241, 0.5);
-        border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-        background: rgba(99, 102, 241, 0.8);
+        color: #CBD5E1;
+        margin: 8px 0;
     }
 
-    /* Interactive Buttons */
-    .stButton>button {
-        background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%) !important;
-        color: white !important;
+    /* ── Data Tables ── */
+    [data-testid="stDataFrame"] {
+        border-radius: 10px !important;
+        overflow: hidden;
+    }
+
+    /* ── Buttons ── */
+    .stButton>button, .stDownloadButton>button {
+        background: linear-gradient(135deg, #4F46E5, #7C3AED) !important;
+        color: #FFFFFF !important;
         border: none !important;
         border-radius: 8px !important;
         font-weight: 600 !important;
-        padding: 0.5rem 1rem !important;
-        transition: all 0.3s ease !important;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.2) !important;
+        font-size: 0.85rem !important;
+        padding: 0.45rem 1.1rem !important;
+        transition: all 0.2s ease !important;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
     }
-    .stButton>button:hover {
-        transform: translateY(-2px) scale(1.02) !important;
-        box-shadow: 0 8px 15px rgba(99, 102, 241, 0.4) !important;
-        background: linear-gradient(135deg, #8B5CF6 0%, #A855F7 100%) !important;
+    .stButton>button:hover, .stDownloadButton>button:hover {
+        transform: translateY(-1px) !important;
+        box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35) !important;
+        background: linear-gradient(135deg, #6366F1, #8B5CF6) !important;
     }
 
-    /* Styled Alert Boxes (info/error/success) */
+    /* ── Info / Warning / Error boxes ── */
     .stAlert {
-        border-radius: 12px !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        backdrop-filter: blur(10px) !important;
-        -webkit-backdrop-filter: blur(10px) !important;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
+        border-radius: 10px !important;
+        border: 1px solid rgba(255, 255, 255, 0.06) !important;
     }
+
+    /* ── Selectbox / Slider / Inputs ── */
+    .stSelectbox label, .stSlider label, .stRadio label {
+        font-weight: 500 !important;
+        color: #94A3B8 !important;
+        font-size: 0.85rem !important;
+    }
+
+    /* ── Metric (st.metric) containers ── */
+    [data-testid="stMetric"] {
+        background: rgba(30, 41, 59, 0.4);
+        border: 1px solid rgba(99, 102, 241, 0.12);
+        border-radius: 12px;
+        padding: 14px 18px;
+    }
+
+    /* ── Custom Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.35); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(99, 102, 241, 0.6); }
+
+    /* ── Plotly charts transparent bg ── */
+    .js-plotly-plot .plotly .main-svg { background: transparent !important; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -302,12 +348,15 @@ def main() -> None:
 
         page = st.radio(
             "Navigation",
-            ["Executive Summary", "Alert Triage", "Entity Profiler", "Explainability", "Concept Drift"],
+            ["📊 Executive Summary", "🚨 Alert Triage", "👤 Entity Profiler", "🔍 Explainability", "📈 Concept Drift"],
             index=0,
+            label_visibility="collapsed",
         )
+        # Strip emoji prefix for page matching
+        page = page.split(" ", 1)[1]
 
         st.markdown("---")
-        st.markdown("### Filters")
+        st.markdown("### 🎛️ Filters")
 
         # Risk score threshold
         risk_threshold = st.slider(
@@ -328,7 +377,7 @@ def main() -> None:
         selected_attack = st.selectbox("Attack Type", attack_types)
 
         st.markdown("---")
-        st.caption(f"Dataset: {len(enriched_df):,} events | {enriched_df['entity_id'].nunique()} entities")
+        st.caption(f"📊 {len(enriched_df):,} events · {enriched_df['entity_id'].nunique()} entities")
 
     # --- Apply Filters ---
     filtered = merged.copy()
@@ -351,35 +400,19 @@ def main() -> None:
         attack_classes = enriched_df[enriched_df["label"] == "Anomaly"]["anomaly_type"].nunique()
         best_model = model_comparison.get("best_model", "LightGBM") if isinstance(model_comparison, dict) else "LightGBM"
 
-        # KPI Row
-        c1, c2, c3, c4, c5 = st.columns(5)
+        # KPI Row — 4 uniform numeric cards
+        c1, c2, c3, c4 = st.columns(4)
         with c1:
-            st.markdown(f"""<div class="metric-card">
-                <h3>Total Events</h3>
-                <p class="metric-value">{len(merged):,}</p>
-            </div>""", unsafe_allow_html=True)
+            st.markdown(f'<div class="metric-card"><h3>Total Events</h3><p class="metric-value">{len(merged):,}</p></div>', unsafe_allow_html=True)
         with c2:
-            st.markdown(f"""<div class="metric-card">
-                <h3>Anomalies Detected</h3>
-                <p class="metric-value">{anomaly_count:,}</p>
-            </div>""", unsafe_allow_html=True)
+            st.markdown(f'<div class="metric-card"><h3>Anomalies</h3><p class="metric-value">{anomaly_count:,}</p></div>', unsafe_allow_html=True)
         with c3:
-            st.markdown(f"""<div class="metric-card">
-                <h3>High-Risk Alerts</h3>
-                <p class="metric-value">{high_risk:,}</p>
-            </div>""", unsafe_allow_html=True)
+            st.markdown(f'<div class="metric-card"><h3>High-Risk Alerts</h3><p class="metric-value">{high_risk:,}</p></div>', unsafe_allow_html=True)
         with c4:
-            st.markdown(f"""<div class="metric-card">
-                <h3>Attack Classes</h3>
-                <p class="metric-value">{attack_classes}</p>
-            </div>""", unsafe_allow_html=True)
-        with c5:
-            st.markdown(f"""<div class="metric-card">
-                <h3>Best Classifier</h3>
-                <p class="metric-value">{best_model}</p>
-            </div>""", unsafe_allow_html=True)
+            st.markdown(f'<div class="metric-card"><h3>Attack Classes</h3><p class="metric-value">{attack_classes}</p></div>', unsafe_allow_html=True)
 
-        st.markdown("")
+        # Best model banner
+        st.markdown(f'<div style="text-align:center;color:#94A3B8;font-size:0.82rem;margin:8px 0 4px 0;">Best Classifier: <strong style="color:#A78BFA;">{best_model}</strong></div>', unsafe_allow_html=True)
 
         # --- Charts Row 1 ---
         col_left, col_right = st.columns(2)
