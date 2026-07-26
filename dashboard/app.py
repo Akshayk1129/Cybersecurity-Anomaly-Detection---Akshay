@@ -66,10 +66,10 @@ st.markdown("""
         background: #0B0F19 !important;
     }
 
-    /* Force Toast popups to top-left corner */
+    /* Force Toast popups to top-left (adjusted past the sidebar) */
     [data-testid="stToastContainer"] {
-        top: 3rem !important;
-        left: 2rem !important;
+        top: 3.5rem !important;
+        left: 24rem !important;
         bottom: auto !important;
         right: auto !important;
     }
