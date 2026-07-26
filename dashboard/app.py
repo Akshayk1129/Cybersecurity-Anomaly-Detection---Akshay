@@ -501,10 +501,10 @@ def main() -> None:
 
             comparison_data = []
             metric_labels = {
-                "avg_session": "Avg Session (min)",
-                "avg_bytes_up": "Avg Bytes Uploaded",
-                "avg_bytes_down": "Avg Bytes Downloaded",
-                "failed_rate": "Failed Login Rate",
+                "session_mean": "Avg Session (min)",
+                "bytes_up_mean": "Avg Bytes Uploaded",
+                "bytes_down_mean": "Avg Bytes Downloaded",
+                "failed_ratio": "Failed Login Rate",
             }
             for key, label in metric_labels.items():
                 entity_val = profile.get(key, 0)
